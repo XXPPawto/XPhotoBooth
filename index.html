@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPhotoBooth</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div>
+            <a href="#" onclick="showSection('main')">Home</a>
+            <a href="#" class="about" onclick="showSection('about')">About</a>
+        </div>
+        <div>
+            <button id="theme-toggle">Dark Mode</button>
+            <a href="#support">Support</a>
+        </div>
+    </div>
+
+    <!-- Main Section -->
+    <div class="main" id="mainSection">
+        <h1>XPhotoBooth</h1>
+        <div class="photobooth">
+            <div class="camera-container">
+                <video id="camera" autoplay></video>
+                <canvas id="photo-canvas" style="display: none;"></canvas>
+                <div class="countdown-timer" id="countdownTimer" style="display: none;">3</div>
+            </div>
+            <div class="controls">
+                <button id="capture-btn" onclick="startPhotoSession()">Capture Photo</button>
+                <button onclick="toggleMirror()">Toggle Mirror</button>
+                <button onclick="applyFilter('none')">No Filter</button>
+                <button onclick="applyFilter('grayscale(100%)')">Grayscale</button>
+                <button onclick="applyFilter('sepia(100%)')">Sepia</button>
+                <button onclick="applyFilter('blur(5px)')">Blur</button>
+                <button onclick="applyFilter('contrast(200%)')">High Contrast</button>
+            </div>
+            <div id="preview-container" style="display: none;">
+                <img id="preview-img" src="" alt="Preview">
+                <button onclick="retakePhoto()">Retake</button>
+                <button onclick="confirmPhoto()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Page -->
+    <div class="result-page" id="resultPage" style="display: none;">
+        <div class="result-container">
+            <h2>Your Photos</h2>
+            <div class="frame-options">
+                <button onclick="applyFrame('basic')">Basic Frame</button>
+                <button onclick="applyFrame('vintage')">Vintage Frame</button>
+                <button onclick="applyFrame('modern')">Modern Frame</button>
+            </div>
+            <div class="photo-grid">
+                <div class="photo-container">
+                    <img id="resultPhoto1" src="" alt="Photo 1">
+                </div>
+                <div class="photo-container">
+                    <img id="resultPhoto2" src="" alt="Photo 2">
+                </div>
+                <div class="photo-container">
+                    <img id="resultPhoto3" src="" alt="Photo 3">
+                </div>
+            </div>
+            <button class="download-btn" onclick="downloadCombinedPhoto()">Download All</button>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="about-section" id="aboutSection" style="display: none;">
+        <div class="about-container">
+            <h2>About XPhotoBooth</h2>
+            <div class="about-content">
+                <p>🎉 Selamat datang di XPhotoBooth - Solusi Fotografi Instan Anda!</p>
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🖼️ 3 Foto Sekaligus</h3>
+                        <p>Ambil 3 foto berturut-turut dengan interval 3 detik</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎨 5 Filter Keren</h3>
+                        <p>Pilih dari berbagai filter: Grayscale, Sepia, Blur, dan lainnya</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🖼️ Frame Custom</h3>
+                        <p>3 pilihan frame eksklusif yang bisa disesuaikan</p>
+                    </div>
+                </div>
+                <div class="tech-info">
+                    <h4>Teknologi yang Digunakan:</h4>
+                    <ul>
+                        <li>📷 Web Camera API</li>
+                        <li>🎨 Canvas Filter</li>
+                        <li>⚡ Modern JavaScript</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2023 XPhotoBooth. All rights reserved.</p>
+    </div>
+
+    <!-- QRIS Modal -->
+    <div class="qris-modal" id="qrisModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Support XPhotoBooth</h2>
+            <p>Scan QRIS berikut untuk mendukung kami:</p>
+            <img src="assets/support.jpg" alt="QRIS Code" class="qris-image">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
