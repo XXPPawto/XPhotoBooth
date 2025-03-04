@@ -73,6 +73,9 @@ function showCountdown(seconds, callback) {
 // Capture photo
 function capturePhoto() {
     const context = canvas.getContext('2d');
+    const aspectRatio = video.videoWidth / video.videoHeight; // Hitung rasio aspek
+    
+    // Sesuaikan ukuran canvas dengan rasio aspek
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
@@ -99,9 +102,18 @@ function capturePhoto() {
 // Add frame to the canvas
 function addFrameToCanvas(context, canvasWidth, canvasHeight) {
     const frame = frameStyles[currentFrame];
+    const frameExtension = 40; // Tambahan tinggi frame untuk watermark
+    
+    // Gambar frame utama
     context.strokeStyle = frame.color;
     context.lineWidth = frame.width;
-    context.strokeRect(0, 0, canvasWidth, canvasHeight);
+    context.strokeRect(0, 0, canvasWidth, canvasHeight + frameExtension);
+    
+    // Tambahkan watermark di bagian frame yang diperpanjang
+    context.font = "20px Arial";
+    context.fillStyle = "rgba(255, 255, 255, 0.7)";
+    context.textAlign = "center";
+    context.fillText("XPhotoBooth", canvasWidth / 2, canvasHeight + frameExtension - 15);
 }
 
 // Show result page with all photos
@@ -138,42 +150,38 @@ function updatePreviewFrames() {
     });
 }
 
-// Fungsi untuk menambahkan watermark
-function addWatermark(context, canvasWidth, canvasHeight) {
-    const watermarkText = "XPhotoBooth";
-    context.font = "30px Arial";
-    context.fillStyle = "rgba(255, 255, 255, 0.7)"; // Warna watermark (putih transparan)
-    context.textAlign = "center";
-    context.fillText(watermarkText, canvasWidth / 2, canvasHeight - 20); // Posisi watermark di bagian bawah
-}
-
 // Download combined photo
 function downloadCombinedPhoto() {
     const combinedCanvas = document.createElement('canvas');
     const context = combinedCanvas.getContext('2d');
     
-    // Sesuaikan ukuran canvas untuk 3 foto vertikal
-    const photoWidth = 600;
-    const photoHeight = 400;
-    const padding = 10; // Jarak antar foto diperkecil
+    const photoWidth = 600; // Lebar foto
+    const aspectRatio = video.videoWidth / video.videoHeight; // Rasio aspek
+    const photoHeight = photoWidth / aspectRatio; // Hitung tinggi berdasarkan rasio aspek
+    const frameExtension = 40; // Tambahan tinggi frame untuk watermark
+    const padding = 10; // Jarak antar foto
     
     combinedCanvas.width = photoWidth + (padding * 2);
-    combinedCanvas.height = (photoHeight * 3) + (padding * 4);
+    combinedCanvas.height = (photoHeight + frameExtension) * 3 + (padding * 4);
     
-    // Latar belakang transparan
     context.fillStyle = 'transparent';
     context.clearRect(0, 0, combinedCanvas.width, combinedCanvas.height);
 
-    // Gunakan Promise untuk memastikan semua frame terproses
     const loadImages = photos.map(photo => {
         return new Promise((resolve) => {
             const img = new Image();
             img.src = photo;
             img.onload = () => {
-                const yPosition = (photoHeight + padding) * photos.indexOf(photo);
+                const yPosition = (photoHeight + frameExtension + padding) * photos.indexOf(photo);
                 
-                // Gambar foto
-                context.drawImage(img, padding, yPosition + padding, photoWidth, photoHeight);
+                // Gambar foto dengan mempertahankan rasio aspek
+                context.drawImage(
+                    img, 
+                    padding, 
+                    yPosition + padding, 
+                    photoWidth, 
+                    photoHeight
+                );
                 
                 // Tambahkan frame
                 context.strokeStyle = frameStyles[currentFrame].color;
@@ -182,19 +190,21 @@ function downloadCombinedPhoto() {
                     padding - (context.lineWidth/2), 
                     yPosition + padding - (context.lineWidth/2), 
                     photoWidth + context.lineWidth, 
-                    photoHeight + context.lineWidth
+                    photoHeight + frameExtension + context.lineWidth
                 );
+                
+                // Tambahkan watermark
+                context.font = "20px Arial";
+                context.fillStyle = "rgba(255, 255, 255, 0.7)";
+                context.textAlign = "center";
+                context.fillText("XPhotoBooth", photoWidth / 2 + padding, yPosition + photoHeight + frameExtension - 15);
                 
                 resolve();
             };
         });
     });
 
-    // Tunggu semua foto selesai dimuat
     Promise.all(loadImages).then(() => {
-        // Tambahkan watermark
-        addWatermark(context, combinedCanvas.width, combinedCanvas.height);
-
         const link = document.createElement('a');
         link.download = 'photobooth-collage.png';
         link.href = combinedCanvas.toDataURL('image/png');
@@ -265,3 +275,12 @@ document.querySelector('.about').addEventListener('click', (e) => {
     e.preventDefault();
     showSection('about');
 });
+
+// Fungsi untuk menyembunyikan welcome page
+function hideWelcomePage() {
+  const welcomePage = document.getElementById('welcomePage');
+  welcomePage.style.opacity = '0';
+  setTimeout(() => {
+      welcomePage.style.display = 'none';
+  }, 500); // Sesuaikan dengan durasi animasi fadeOut
+}
